@@ -1,0 +1,85 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: istio-springboot-demo-a-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: istio-springboot-demo-a-dr
+spec:
+  host: istio-springboot-demo-a
+  trafficPolicy:
+    loadBalancer:
+        simple: LEAST_CONN
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+    trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN
+  - name: latest
+    labels: 
+      version: latest
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: istio-springboot-demo-a-vs
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - istio-springboot-demo-a-gateway
+  http:
+  - match:
+    - queryParams:
+        a:
+          # exact: ad
+          regex: av\d+$
+    route:
+    - destination:
+        host: istio-springboot-demo-a
+        subset: v1
+    corsPolicy:
+      allowOrigins:
+      - regex: "http://.*"
+      allowMethods:
+      - POST
+      - GET
+      allowHeaders:
+      - XSRF-TOKEN
+      - xsrfHeaderName
+      - X-XSRF-TOKEN
+      - maxContentLength
+      - maxBodyLength
+  - route:
+    - destination:
+        host: istio-springboot-demo-a
+        subset: latest
+    corsPolicy:
+      allowOrigins:
+      - regex: "http://.*"
+      allowMethods:
+      - POST
+      - GET
+      allowHeaders:
+      - XSRF-TOKEN
+      - xsrfHeaderName
+      - X-XSRF-TOKEN
+      - maxContentLength
+      - maxBodyLength
+
+
+

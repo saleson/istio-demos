@@ -1,0 +1,3 @@
+server:
+  application: test-c
+  port: 8082

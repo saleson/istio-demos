@@ -1,0 +1,12 @@
+apiVersion: v1 #定义k8s api的版本v1
+kind: Pod #kind资源 Pod
+metadata: #属性，名字叫nginx,标签叫app : web(键值对)
+  name: demo-istio-h5
+  labels:
+    app: demo-istio-h5
+spec: #详细
+  containers: #容器信息
+    - name: demo-istio-h5 #容器叫nginx
+      image: demo-istio-h5:v1.0 #使用的镜像，这样是使用本地nginx镜像，当然可以使用私有仓库镜像*.*.*.*:5000/nginx:latest
+      ports: #容器开放的端口
+        - containerPort: 80
